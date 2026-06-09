@@ -1,0 +1,403 @@
+/*
+ * EventPlanner — globalni vizualni identitet (indigo + amber paleta)
+ * Override Bootstrap 4 / bootstrap-vue klasa bez diranja izvornog CSS-a
+ */
+
+:root {
+  --ep-indigo: #4f46e5;
+  --ep-indigo-tamni: #4338ca;
+  --ep-amber: #f59e0b;
+  --ep-amber-tamni: #d97706;
+  --ep-pozadina: #f8fafc;
+  --ep-tekst: #1e293b;
+  --ep-tekst-blago: #64748b;
+  --ep-rub: #e2e8f0;
+  --ep-radius: 8px;
+  --ep-sjena: 0 6px 22px rgba(15, 23, 42, 0.12);
+  --ep-sjena-hover: 0 10px 28px rgba(15, 23, 42, 0.16);
+}
+
+/*
+ * Točkasti uzorak (dot grid) — indigo + amber, pomaknuti slojevi
+ * background-attachment: fixed — uzorak ne skače pri scrollu
+ */
+html,
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  background-color: #f8fafc;
+  background-image: radial-gradient(
+      circle,
+      rgba(79, 70, 229, 0.28) 2px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle,
+      rgba(245, 158, 11, 0.22) 2px,
+      transparent 2px
+    );
+  background-size: 28px 28px, 28px 28px;
+  background-position: 0 0, 14px 14px;
+  background-attachment: fixed;
+  color: var(--ep-tekst);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  min-height: 100vh;
+  background: transparent;
+}
+
+button,
+input,
+select,
+textarea,
+.btn {
+  font-family: inherit;
+}
+
+a {
+  color: var(--ep-indigo);
+}
+
+a:hover {
+  color: var(--ep-indigo-tamni);
+}
+
+/* Primarni gumbi */
+.btn-primary {
+  background-color: var(--ep-indigo);
+  border-color: var(--ep-indigo);
+  border-radius: var(--ep-radius);
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.25);
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary:not(:disabled):not(.disabled):active {
+  background-color: var(--ep-indigo-tamni);
+  border-color: var(--ep-indigo-tamni);
+  box-shadow: var(--ep-sjena);
+}
+
+.btn-primary:focus,
+.btn-primary.focus {
+  box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.35);
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled {
+  background-color: var(--ep-indigo);
+  border-color: var(--ep-indigo);
+  opacity: 0.65;
+}
+
+.btn-outline-primary {
+  color: var(--ep-indigo);
+  border-color: var(--ep-indigo);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: var(--ep-indigo);
+  border-color: var(--ep-indigo);
+  color: #ffffff;
+}
+
+.btn {
+  border-radius: var(--ep-radius);
+}
+
+/* Kartice — puna bijela + jača sjena radi čitljivosti na šarenoj pozadini */
+.card {
+  border: none;
+  border-radius: var(--ep-radius);
+  box-shadow: var(--ep-sjena);
+  background-color: #ffffff;
+  margin-bottom: 1.25rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--ep-sjena-hover);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--ep-rub);
+  border-radius: var(--ep-radius) var(--ep-radius) 0 0 !important;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+}
+
+/* Forme */
+.form-control {
+  border-radius: var(--ep-radius);
+  border-color: var(--ep-rub);
+  color: var(--ep-tekst);
+  padding: 0.55rem 0.85rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: var(--ep-indigo);
+  box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.2);
+  color: var(--ep-tekst);
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+label,
+.col-form-label {
+  color: var(--ep-tekst);
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+/* Navbar — indigo, tri zone (centar fiksiran, Profil desno) */
+.navbar-eventplanner {
+  background-color: var(--ep-indigo) !important;
+  box-shadow: 0 2px 16px rgba(79, 70, 229, 0.3);
+  padding: 0.75rem 1rem;
+}
+
+.navbar-eventplanner .navbar-triple {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.navbar-eventplanner .navbar-zona {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-eventplanner .navbar-zona-lijevo {
+  flex: 1;
+  min-width: 0;
+}
+
+.navbar-eventplanner .navbar-zona-sredina {
+  flex: 0 1 auto;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+}
+
+.navbar-eventplanner .navbar-zona-desno {
+  flex: 1;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.navbar-eventplanner .nav-grupa-centar {
+  flex-direction: row;
+  align-items: center;
+}
+
+.navbar-eventplanner .navbar-brand-centar {
+  margin-right: 0;
+  margin-left: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.navbar-eventplanner .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: 6px;
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.navbar-eventplanner .nav-link:hover,
+.navbar-eventplanner .nav-link:focus {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.navbar-eventplanner .nav-link.router-link-exact-active,
+.navbar-eventplanner .nav-link.router-link-active {
+  color: var(--ep-amber) !important;
+  background-color: rgba(245, 158, 11, 0.18);
+}
+
+.navbar-eventplanner .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+@media (min-width: 768px) {
+  .navbar-eventplanner .navbar-triple {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .navbar-eventplanner .navbar-zona-sredina {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-wrap: nowrap;
+  }
+
+  .navbar-eventplanner .navbar-collapse {
+    position: relative;
+  }
+}
+
+/* Upozorenja i poruke */
+.alert {
+  border-radius: var(--ep-radius);
+  border: none;
+}
+
+.alert-danger {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+.container {
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--ep-tekst);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  margin-bottom: 1.25rem;
+}
+
+/* Tekstualni logo EventPlanner */
+.logo-eventplanner {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.logo-eventplanner .logo-event {
+  color: var(--ep-tekst);
+}
+
+.logo-eventplanner .logo-planner {
+  color: var(--ep-amber);
+}
+
+/* Logo u navbaru — Event bijelo, Planner amber */
+.navbar-eventplanner .logo-eventplanner .logo-event {
+  color: #ffffff;
+}
+
+.navbar-eventplanner .logo-eventplanner .logo-planner {
+  color: var(--ep-amber);
+}
+
+.navbar-eventplanner .logo-eventplanner.logo-navbar {
+  font-size: 1.65rem;
+}
+
+/* Auth stranice — kartica centrirana na ekranu */
+.auth-stranica {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background: transparent;
+}
+
+.auth-kartica {
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 0;
+}
+
+.auth-kartica:hover {
+  box-shadow: var(--ep-sjena);
+}
+
+.auth-kartica .card-body {
+  padding: 2rem 2rem 1.75rem;
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.auth-naslov {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.auth-podnaslov {
+  text-align: center;
+  color: var(--ep-tekst-blago);
+  font-size: 0.95rem;
+  margin-bottom: 1.75rem;
+}
+
+.auth-kartica .form-group {
+  margin-bottom: 1.35rem;
+}
+
+.auth-kartica .form-control {
+  padding: 0.65rem 0.9rem;
+}
+
+.auth-kartica .btn-primary {
+  width: 100%;
+  padding: 0.7rem 1.25rem;
+  margin-top: 0.25rem;
+  font-weight: 600;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  color: var(--ep-tekst-blago);
+  font-size: 0.9rem;
+}
+
+.auth-link a {
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+/* Pomoćna klasa za indigo akcent u komponentama */
+.text-indigo {
+  color: var(--ep-indigo) !important;
+}
+
+.text-amber {
+  color: var(--ep-amber) !important;
+}
