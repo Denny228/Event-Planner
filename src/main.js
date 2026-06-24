@@ -13,6 +13,13 @@ import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 // Firebase initializeApp — izvršava se pri učitavanju modula
 import "./firebase";
 
+import { jeAdmin, ulogaKorisnika, pocetnaRutaZaKorisnika } from "@/utils/uloga";
+
+// Globalni helperi za ulogu — dostupni u svim komponentama kao this.$jeAdmin(...)
+Vue.prototype.$jeAdmin = jeAdmin;
+Vue.prototype.$ulogaKorisnika = ulogaKorisnika;
+Vue.prototype.$pocetnaRutaZaKorisnika = pocetnaRutaZaKorisnika;
+
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 

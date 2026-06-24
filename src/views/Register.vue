@@ -48,6 +48,8 @@
 
 <script>
 import { auth } from "@/firebase";
+import { pocetnaRutaZaKorisnika } from "@/utils/uloga";
+import { sigurnaNavigacija } from "@/utils/routerNavigacija";
 
 export default {
   name: "StranicaRegistracija",
@@ -66,7 +68,10 @@ export default {
 
       try {
         await auth.createUserWithEmailAndPassword(this.email, this.lozinka);
-        this.$router.push("/");
+        await sigurnaNavigacija(
+          this.$router,
+          pocetnaRutaZaKorisnika(auth.currentUser)
+        );
       } catch (greska) {
         this.greskaPoruka = this.pretvoriGresku(greska);
       } finally {
