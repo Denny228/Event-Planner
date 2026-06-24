@@ -1,6 +1,9 @@
 <template>
   <div class="container py-4">
-    <h1 class="mb-4">Statistika</h1>
+    <h1 class="mb-2">Statistika</h1>
+    <p class="text-muted mb-4">
+      Pregled svih upita klijenata po stanju i vrsti snimanja.
+    </p>
 
     <b-alert v-if="greskaPoruka" show variant="danger" dismissible @dismissed="greskaPoruka = ''">
       {{ greskaPoruka }}
@@ -11,30 +14,41 @@
       Učitavanje podataka...
     </div>
 
-    <div v-else-if="dogadaji.length === 0" class="text-center text-muted py-5">
-      <p class="mb-0">Nema podataka za prikaz.</p>
-      <p class="small">Dodaj događaje da vidiš statistiku.</p>
+    <div v-else-if="upiti.length === 0" class="text-center text-muted py-5">
+      <p class="mb-0">Još nema upita za prikaz.</p>
     </div>
 
     <div v-else>
-      <!-- Brojčani sažetak -->
+      <!-- Sažetak — 5 kartica -->
       <b-row class="mb-4">
-        <b-col md="4" class="mb-3 mb-md-0">
+        <b-col cols="6" lg class="mb-3 mb-lg-0">
           <b-card class="text-center sazetak-kartica">
-            <p class="sazetak-broj mb-1">{{ ukupnoDogadaja }}</p>
-            <p class="sazetak-naziv mb-0">Ukupno događaja</p>
+            <p class="sazetak-broj mb-1">{{ ukupnoUpita }}</p>
+            <p class="sazetak-naziv mb-0">Ukupno upita</p>
           </b-card>
         </b-col>
-        <b-col md="4" class="mb-3 mb-md-0">
+        <b-col cols="6" lg class="mb-3 mb-lg-0">
           <b-card class="text-center sazetak-kartica">
-            <p class="sazetak-broj mb-1 text-indigo">{{ brojPlaniranih }}</p>
-            <p class="sazetak-naziv mb-0">Planirani</p>
+            <p class="sazetak-broj mb-1 text-novi">{{ brojNovih }}</p>
+            <p class="sazetak-naziv mb-0">Novi</p>
           </b-card>
         </b-col>
-        <b-col md="4">
+        <b-col cols="6" lg class="mb-3 mb-lg-0">
           <b-card class="text-center sazetak-kartica">
-            <p class="sazetak-broj mb-1 text-zavrseno">{{ brojZavrsenih }}</p>
-            <p class="sazetak-naziv mb-0">Završeni</p>
+            <p class="sazetak-broj mb-1 text-aktivni">{{ brojAktivnih }}</p>
+            <p class="sazetak-naziv mb-0">Aktivni</p>
+          </b-card>
+        </b-col>
+        <b-col cols="6" lg class="mb-3 mb-lg-0">
+          <b-card class="text-center sazetak-kartica">
+            <p class="sazetak-broj mb-1 text-odradeno">{{ brojOdrađenih }}</p>
+            <p class="sazetak-naziv mb-0">Odrađeno</p>
+          </b-card>
+        </b-col>
+        <b-col cols="6" lg class="mb-3 mb-lg-0">
+          <b-card class="text-center sazetak-kartica">
+            <p class="sazetak-broj mb-1 text-odbijeno">{{ brojOdbijenih }}</p>
+            <p class="sazetak-naziv mb-0">Odbijeno</p>
           </b-card>
         </b-col>
       </b-row>
@@ -43,16 +57,16 @@
       <b-row>
         <b-col lg="6" class="mb-4">
           <b-card>
-            <h5 class="mb-3">Događaji po fazama</h5>
+            <h5 class="mb-3">Upiti po stanju</h5>
             <div class="graf-wrap">
-              <graf-faze :podaci="podaciGrafFaze" :opcije="opcijeGrafa" />
+              <graf-faze :podaci="podaciGrafStanja" :opcije="opcijeGrafa" />
             </div>
           </b-card>
         </b-col>
 
         <b-col lg="6" class="mb-4">
           <b-card>
-            <h5 class="mb-3">Događaji po vrstama</h5>
+            <h5 class="mb-3">Upiti po vrsti snimanja</h5>
             <div class="graf-wrap">
               <graf-vrste :podaci="podaciGrafVrste" :opcije="opcijeGrafa" />
             </div>
@@ -64,24 +78,46 @@
 </template>
 
 <script>
-import { db, auth } from "@/firebase";
+import { db } from "@/firebase";
 import GrafFaze from "@/components/GrafFaze.vue";
 import GrafVrste from "@/components/GrafVrste.vue";
 
-// Fiksni redoslijed faza i vrsta — mora odgovarati vrijednostima u bazi
-const FAZE = ["Upit", "Potvrđeno", "Snimanje", "Obrada", "Isporučeno"];
-const VRSTE = ["vjenčanje", "rođendan", "event", "promo"];
+// 4 grupe stanja — mora odgovarati admin panelu i statusima u bazi
+const GRUPE_STANJA = [
+  { naziv: "Novi", statusi: ["Upit"] },
+  { naziv: "Aktivni", statusi: ["Potvrđeno", "Snimanje", "Obrada"] },
+  { naziv: "Odrađeni", statusi: ["Isporučeno"] },
+  { naziv: "Odbijeni", statusi: ["Odbijeno"] },
+];
+
+const VRSTE = [
+  "vjenčanje",
+  "rođendan",
+  "event",
+  "promo",
+  "fotografiranje",
+  "ostalo",
+];
 
 const OZNAKE_VRSTA = {
   vjenčanje: "Vjenčanje",
   rođendan: "Rođendan",
   event: "Event",
   promo: "Promo",
+  fotografiranje: "Fotografiranje",
+  ostalo: "Ostalo",
 };
 
-// Indigo + amber paleta za stupce grafova
-const BOJE_FAZE = ["#64748b", "#4f46e5", "#6366f1", "#4338ca", "#059669"];
-const BOJE_VRSTE = ["#4f46e5", "#6366f1", "#4338ca", "#f59e0b"];
+// Boje usklađene s admin panelom
+const BOJE_STANJA = ["#eab308", "#059669", "#475569", "#dc2626"];
+const BOJE_VRSTE = [
+  "#4f46e5",
+  "#6366f1",
+  "#4338ca",
+  "#f59e0b",
+  "#64748b",
+  "#94a3b8",
+];
 
 export default {
   name: "StranicaStatistika",
@@ -91,7 +127,7 @@ export default {
   },
   data() {
     return {
-      dogadaji: [],
+      upiti: [],
       ucitavanje: true,
       greskaPoruka: "",
       opcijeGrafa: {
@@ -114,32 +150,26 @@ export default {
     };
   },
   computed: {
-    ukupnoDogadaja() {
-      return this.dogadaji.length;
+    ukupnoUpita() {
+      return this.upiti.length;
     },
-    brojPlaniranih() {
-      return this.dogadaji.filter(
-        (dogadaj) => dogadaj.status !== "Isporučeno"
-      ).length;
+    brojNovih() {
+      return this.brojPoStatusima(["Upit"]);
     },
-    brojZavrsenih() {
-      return this.dogadaji.filter(
-        (dogadaj) => dogadaj.status === "Isporučeno"
-      ).length;
+    brojAktivnih() {
+      return this.brojPoStatusima(["Potvrđeno", "Snimanje", "Obrada"]);
     },
-    brojeviPoFazama() {
-      const brojevi = {};
-      FAZE.forEach((faza) => {
-        brojevi[faza] = 0;
-      });
-
-      this.dogadaji.forEach((dogadaj) => {
-        if (Object.prototype.hasOwnProperty.call(brojevi, dogadaj.status)) {
-          brojevi[dogadaj.status]++;
-        }
-      });
-
-      return brojevi;
+    brojOdrađenih() {
+      return this.brojPoStatusima(["Isporučeno"]);
+    },
+    brojOdbijenih() {
+      return this.brojPoStatusima(["Odbijeno"]);
+    },
+    brojeviPoGrupamaStanja() {
+      return GRUPE_STANJA.map((grupa) => ({
+        naziv: grupa.naziv,
+        broj: this.brojPoStatusima(grupa.statusi),
+      }));
     },
     brojeviPoVrstama() {
       const brojevi = {};
@@ -147,22 +177,22 @@ export default {
         brojevi[vrsta] = 0;
       });
 
-      this.dogadaji.forEach((dogadaj) => {
-        if (Object.prototype.hasOwnProperty.call(brojevi, dogadaj.vrsta)) {
-          brojevi[dogadaj.vrsta]++;
+      this.upiti.forEach((upit) => {
+        if (Object.prototype.hasOwnProperty.call(brojevi, upit.vrsta)) {
+          brojevi[upit.vrsta]++;
         }
       });
 
       return brojevi;
     },
-    podaciGrafFaze() {
+    podaciGrafStanja() {
       return {
-        labels: FAZE,
+        labels: this.brojeviPoGrupamaStanja.map((grupa) => grupa.naziv),
         datasets: [
           {
-            label: "Broj događaja",
-            backgroundColor: BOJE_FAZE,
-            data: FAZE.map((faza) => this.brojeviPoFazama[faza]),
+            label: "Broj upita",
+            backgroundColor: BOJE_STANJA,
+            data: this.brojeviPoGrupamaStanja.map((grupa) => grupa.broj),
           },
         ],
       };
@@ -172,7 +202,7 @@ export default {
         labels: VRSTE.map((vrsta) => OZNAKE_VRSTA[vrsta]),
         datasets: [
           {
-            label: "Broj događaja",
+            label: "Broj upita",
             backgroundColor: BOJE_VRSTE,
             data: VRSTE.map((vrsta) => this.brojeviPoVrstama[vrsta]),
           },
@@ -181,23 +211,19 @@ export default {
     },
   },
   mounted() {
-    this.ucitajDogadaje();
+    this.ucitajUpite();
   },
   methods: {
-    async ucitajDogadaje() {
-      const korisnik = auth.currentUser;
-      if (!korisnik) {
-        this.ucitavanje = false;
-        return;
-      }
+    brojPoStatusima(statusi) {
+      return this.upiti.filter((upit) => statusi.includes(upit.status)).length;
+    },
 
+    async ucitajUpite() {
       try {
-        const snapshot = await db
-          .collection("dogadaji")
-          .where("uid", "==", korisnik.uid)
-          .get();
+        // Admin vidi SVE upite — bez uid filtra
+        const snapshot = await db.collection("dogadaji").get();
 
-        this.dogadaji = snapshot.docs.map((doc) => ({
+        this.upiti = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
@@ -233,7 +259,19 @@ export default {
   font-size: 0.95rem;
 }
 
-.text-zavrseno {
+.text-novi {
+  color: #ca8a04 !important;
+}
+
+.text-aktivni {
   color: #059669 !important;
+}
+
+.text-odradeno {
+  color: #475569 !important;
+}
+
+.text-odbijeno {
+  color: #dc2626 !important;
 }
 </style>

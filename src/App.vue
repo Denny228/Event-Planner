@@ -18,17 +18,18 @@
           ></div>
 
           <div class="navbar-zona navbar-zona-sredina">
-            <b-navbar-nav class="nav-grupa-centar">
-              <b-nav-item to="/dogadaji">Događaji</b-nav-item>
+            <!-- Admin: panel + logo + statistika; klijent: samo logo (početna ruta) -->
+            <b-navbar-nav v-if="jeAdminKorisnik" class="nav-grupa-centar">
+              <b-nav-item to="/admin">Admin panel</b-nav-item>
             </b-navbar-nav>
 
-            <b-navbar-brand to="/" class="navbar-brand-centar">
+            <b-navbar-brand :to="pocetnaRuta" class="navbar-brand-centar">
               <span class="logo-eventplanner logo-navbar">
                 <span class="logo-event">Event</span><span class="logo-planner">Planner</span>
               </span>
             </b-navbar-brand>
 
-            <b-navbar-nav class="nav-grupa-centar">
+            <b-navbar-nav v-if="jeAdminKorisnik" class="nav-grupa-centar">
               <b-nav-item to="/statistika">Statistika</b-nav-item>
             </b-navbar-nav>
           </div>
@@ -48,18 +49,29 @@
 
 <script>
 import { auth } from "@/firebase";
+import { jeAdmin, pocetnaRutaZaKorisnika } from "@/utils/uloga";
 
 export default {
   name: "App",
   data() {
     return {
       prijavljen: false,
+      trenutniKorisnik: null,
     };
+  },
+  computed: {
+    jeAdminKorisnik() {
+      return jeAdmin(this.trenutniKorisnik);
+    },
+    pocetnaRuta() {
+      return pocetnaRutaZaKorisnika(this.trenutniKorisnik);
+    },
   },
   mounted() {
     // Navbar se prikazuje tek kad Firebase potvrdi prijavu
     this.odjavaAuthPromatrac = auth.onAuthStateChanged((korisnik) => {
       this.prijavljen = korisnik !== null;
+      this.trenutniKorisnik = korisnik;
     });
   },
   beforeDestroy() {
